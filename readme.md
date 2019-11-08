@@ -1,6 +1,6 @@
 # Discern
 A one line script to set up google analytics and [segment](https://segment.com/) 
-tracking for all events on your website. No coding require other than a pasted snippet.
+tracking for all events on your website. Setup is a single copy & paste. 
 
 ## Setup
 
@@ -12,7 +12,7 @@ First make sure you've installed either google analytics or segment on your site
 <script src="https://cdn.jsdelivr.net/gh/urimerhav/discern/js/discern.js">
 
 <script>
-    const discern = new Discern("YOUR_API_KEY");
+    const discern = new Discern();
 </script>
 ``` 
 
