@@ -6,7 +6,7 @@ tracking for all events on your website. Setup is a single copy & paste.
 
 First make sure you've installed either google analytics or segment on your site's `<head>` tag. Then:
  
- 1. Paste the following lines right before the closing `</body>` tag on the webpage where you wish to track events.
+Paste the following lines right before the closing `</body>` tag on the webpage where you wish to track events.
 
 ```
 <script src="https://cdn.jsdelivr.net/gh/urimerhav/discern/js/discern.js">
