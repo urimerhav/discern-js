@@ -43,7 +43,7 @@ class Discern {
         for (let button of all_buttons) {
             let button_name = this.name_button(button);
             console.log(button);
-            button.addEventListener('click', () => this.report_event('click_' + button_name))
+            button.addEventListener('click', () => this.report_event(button_name + ' clicked'))
         }
     }
 
