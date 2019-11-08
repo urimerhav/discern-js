@@ -16,4 +16,4 @@ First make sure you've installed either google analytics or segment on your site
 </script>
 ``` 
 
-That's it! All important events will now be automatically tracked and sent to your analytic solution.
+That's it! All important events will now be automatically tracked and sent to your analytics solution.
