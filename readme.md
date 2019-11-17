@@ -21,7 +21,7 @@ Paste the following lines below the google analytics / segment tag and above the
 Note that you would have to place it in every page you would want to track (same as with google analytics / segment).
 
 ```
-<script src="https://cdn.jsdelivr.net/gh/urimerhav/discern/js/discern.js">
+<script src="https://cdn.jsdelivr.net/gh/urimerhav/discern/js/discern.js"> </script>
 
 <script>
     const discern = new Discern();
