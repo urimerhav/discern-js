@@ -35,16 +35,6 @@ class Discern {
         Http.open("POST", url, true);
         Http.send(data);
     }
-
-    reportEvent(event, payload=null) {
-        if (typeof gtag !== 'undefined') {
-            gtag('event', event)
-        }
-        // and so report for every analytic suite..
-        if (typeof analytics !== 'undefined') {
-            analytics.track(event, payload)
-        }
-    }
 }
 
 
@@ -65,7 +55,7 @@ function applyListeners(elementInstructions) {
         }
         if (element !== null) {
             console.log(element);
-            element.addEventListener('click', () => this.reportEvent(elementName + ' clicked'))
+            element.addEventListener('click', () => reportEvent(elementName + ' clicked'))
         }
     }
 }
@@ -85,10 +75,22 @@ function nameElement(element, classIdx=null) {
 }
 
 
-function WriteElementToDB(document) {
+function reportEvent(event, payload=null) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', event)
+    }
+    // and so report for every analytic suite..
+    if (typeof analytics !== 'undefined') {
+        analytics.track(event, payload)
+    }
+}
+
+
+function WriteElementToDB(activeElement, name='') {
     var output_json = {
         'domain': document.location.host,
         'page': document.location.pathname,
+        'name': name,
         'instructions': {
             'id': '',
             'className': '',
@@ -96,20 +98,20 @@ function WriteElementToDB(document) {
     };
     var addElement = false;
 
-    if (document.activeElement.id !== "") {
-        output_json['instructions']['id'] = document.activeElement.id;
+    if (activeElement.id !== "") {
+        output_json['instructions']['id'] = activeElement.id;
         addElement = true;
     }
-    else if (document.activeElement.className !== "") {
-        const classElements = document.getElementsByClassName(document.activeElement.className);
+    else if (activeElement.className !== "") {
+        const classElements = document.getElementsByClassName(activeElement.className);
         var i;
         var classIndex = -1;
         for (i = 0; i < classElements.length; i++) {
-            if (classElements[i] === document.activeElement) {
+            if (classElements[i] === activeElement) {
                 classIndex = i;
             }
         }
-        output_json['instructions']['className'] = document.activeElement.className;
+        output_json['instructions']['className'] = activeElement.className;
         output_json['instructions']['classIndex'] = classIndex;
         addElement = true;
     }
