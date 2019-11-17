@@ -55,7 +55,7 @@ function applyListeners(elementInstructions) {
         }
         if (element !== null) {
             console.log(element);
-            element.addEventListener('click', () => reportEvent(elementName + ' clicked'))
+            element.addEventListener('click', () => reportEvent(elementName))
         }
     }
 }
@@ -75,13 +75,25 @@ function nameElement(element, classIdx=null) {
 }
 
 
-function reportEvent(event, payload=null) {
+function reportEvent(elementName, payload=null) {
+    // and so report for every analytic suite
+
+    // google analytics, gtag version
     if (typeof gtag !== 'undefined') {
-        gtag('event', event)
+        gtag('event', elementName, {'event_category': 'button', 'event_label': 'discern'})
     }
-    // and so report for every analytic suite..
+
+    // google analytics, gtag version
+    if (typeof ga !== 'undefined') {
+        ga('send', {hitType: 'event', eventCategory: 'button', eventAction: elementName, eventLabel: 'discern'});
+    }
+
     if (typeof analytics !== 'undefined') {
-        analytics.track(event, payload)
+        analytics.track(elementName + ' click', payload)
+    }
+
+    if (typeof analytics !== 'undefined') {
+        analytics.track(elementName + ' click', payload)
     }
 }
 
