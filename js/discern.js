@@ -42,7 +42,7 @@ function applyListeners(elementDicts) {
     const keys = Object.keys(elementDicts);
     for (let key of keys) {
         let elementDict = elementDicts[key];
-        if ((!("instruction" in elementDict)) || (!("event_action" in elementDict)) || (!("inner_text" in elementDict))) {
+        if ((!("instructions" in elementDict)) || (!("event_action" in elementDict)) || (!("inner_text" in elementDict))) {
             continue;
         }
         let elementInstruction = elementDict['instructions'];
