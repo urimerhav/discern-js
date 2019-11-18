@@ -70,7 +70,7 @@ function reportEvent(eventAction, eventLabel) {
 
     // segment
     if (typeof analytics !== 'undefined') {
-        analytics.track(eventAction, {'event_category': eventCategory, 'event_label': eventLabel});
+        analytics.track(eventAction, {'category': eventCategory, 'label': eventLabel});
     }
 
     // google tag manager
