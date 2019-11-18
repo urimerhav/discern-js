@@ -42,19 +42,47 @@ function applyListeners(elementDicts) {
     const keys = Object.keys(elementDicts);
     for (let key of keys) {
         let elementDict = elementDicts[key];
+        if ((!("instruction" in elementDict)) || (!("event_action" in elementDict)) || (!("inner_text" in elementDict))) {
+            continue;
+        }
         let elementInstruction = elementDict['instructions'];
         let eventAction = elementDict['event_action'];
-        let eventLabel = '';
-        if ('inner_text' in elementDict) {
-            eventLabel = elementDict['inner_text']
-        }
+        let eventLabel = elementDict['inner_text'];
         var elementObject = null;
         if (elementInstruction['id'] !== '') {
             elementObject = document.getElementById(elementInstruction['id']);
         }
         else if (elementInstruction['className'] !== '') {
             let classElements = document.getElementsByClassName(elementInstruction['className']);
-            elementObject = classElements[elementInstruction['classIndex']];
+            var classCounter = 0;
+            var classIndex = -1;
+            for (let i = 0; i < classElements.length; i++) {
+                if (classElements[i].textContent === eventLabel) {
+                    if (classCounter === elementInstruction['classIndex']) {
+                        classIndex = classCounter;
+                    }
+                    else {
+                        classCounter += 1;
+                    }
+                }
+            }
+            elementObject = classElements[classIndex];
+        }
+        else if (elementInstruction['tagName'] !== '') {
+            let tagElements = document.getElementsByTagName(elementInstruction['tagName']);
+            var tagCounter = 0;
+            var tagIndex = -1;
+            for (let i = 0; i < tagElements.length; i++) {
+                if (tagElements[i].textContent === eventLabel) {
+                    if (tagCounter === elementInstruction['classIndex']) {
+                        tagIndex = tagCounter;
+                    }
+                    else {
+                        tagCounter += 1;
+                    }
+                }
+            }
+            elementObject = tagElements[tagIndex];
         }
         if (elementObject !== null) {
             elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel))
@@ -90,7 +118,8 @@ function reportEvent(eventAction, eventLabel) {
 }
 
 
-function annotateElement(activeElement, event_action) {
+function annotateElement(event_action) {
+    const activeElement = document.activeElement;
     var output_json = {
         'domain': document.location.host,
         'page': document.location.pathname,
@@ -99,21 +128,29 @@ function annotateElement(activeElement, event_action) {
         'instructions': {
             'id': '',
             'className': '',
-            'classIndex': ''}
+            'classIndex': '',
+            'tagName': '',
+            'tagIndex': ''}
     };
     var addElement = false;
 
+    // first see if this element has an ID
     if (activeElement.id !== "") {
         output_json['instructions']['id'] = activeElement.id;
         addElement = true;
     }
+
+    // second, see if this element has an class
     else if (activeElement.className !== "") {
         const classElements = document.getElementsByClassName(activeElement.className);
-        var i;
+        var classCounter = 0;
         var classIndex = -1;
-        for (i = 0; i < classElements.length; i++) {
+        for (let i = 0; i < classElements.length; i++) {
             if (classElements[i] === activeElement) {
-                classIndex = i;
+                classIndex = classCounter;
+            }
+            else if (classElements[i].textContent === activeElement.textContent) {
+                classCounter += 1;
             }
         }
         output_json['instructions']['className'] = activeElement.className;
@@ -121,6 +158,23 @@ function annotateElement(activeElement, event_action) {
         addElement = true;
     }
 
+    // third, use the tag
+    else if (activeElement.tagName !== "") {
+        const tagElements = document.getElementsByTagName(activeElement.tagName);
+        var tagCounter = 0;
+        var tagIndex = -1;
+        for (let i = 0; i < tagElements.length; i++) {
+            if (tagElements[i] === activeElement) {
+                tagIndex = tagCounter;
+            }
+            else if (tagElements[i].textContent === activeElement.textContent) {
+                tagCounter += 1;
+            }
+        }
+        output_json['instructions']['tagName'] = activeElement.tagName;
+        output_json['instructions']['tagIndex'] = tagIndex;
+        addElement = true;
+    }
     if (addElement) {
         const Http = new XMLHttpRequest();
         const url = 'https://discern-app.herokuapp.com/add_element';
