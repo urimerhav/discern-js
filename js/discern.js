@@ -38,71 +38,65 @@ class Discern {
 }
 
 
-function applyListeners(elementInstructions) {
-    const keys = Object.keys(elementInstructions);
+function applyListeners(elementDicts) {
+    const keys = Object.keys(elementDicts);
     for (let key of keys) {
-        let elementInstruction = elementInstructions[key];
-        var element = null;
-        let elementName = '';
+        let elementDict = elementDicts[key];
+        let elementInstruction = elementDict['instructions'];
+        let eventAction = elementDict['event_action'];
+        let eventLabel = '';
+        if ('inner_text' in elementDict) {
+            eventLabel = elementDict['inner_text']
+        }
+        var elementObject = null;
         if (elementInstruction['id'] !== '') {
-            element = document.getElementById(elementInstruction['id']);
-            elementName = nameElement(element)
+            elementObject = document.getElementById(elementInstruction['id']);
         }
         else if (elementInstruction['className'] !== '') {
             let classElements = document.getElementsByClassName(elementInstruction['className']);
-            element = classElements[elementInstruction['classIndex']];
-            elementName = nameElement(element, elementInstruction['classIndex'])
+            elementObject = classElements[elementInstruction['classIndex']];
         }
-        if (element !== null) {
-            console.log(element);
-            element.addEventListener('click', () => reportEvent(elementName))
+        if (elementObject !== null) {
+            elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel))
         }
     }
 }
 
 
-function nameElement(element, classIdx=null) {
-    if (element.id) {
-        return element.id;
-    }
-    if (element.innerText) {
-        return element.innerText;
-    }
-    if (element.className && classIdx) {
-        return element.className + "_" + classIdx;
-    }
-    return 'unknown_button'
-}
+function reportEvent(eventAction, eventLabel) {
+    // and so report for every analytic suite, in order of priority
 
+    const eventCategory = 'Discern: ' + document.location.pathname;
 
-function reportEvent(elementName, payload=null) {
-    // and so report for every analytic suite
-
-    // google analytics, gtag version
-    if (typeof gtag !== 'undefined') {
-        gtag('event', elementName, {'event_category': 'button', 'event_label': 'discern'})
-    }
-
-    // google analytics, gtag version
-    if (typeof ga !== 'undefined') {
-        ga('send', {hitType: 'event', eventCategory: 'button', eventAction: elementName, eventLabel: 'discern'});
-    }
-
+    // segment
     if (typeof analytics !== 'undefined') {
-        analytics.track(elementName + ' click', payload)
+        analytics.track(eventAction, {'event_category': eventCategory, 'event_label': eventLabel});
     }
 
-    if (typeof analytics !== 'undefined') {
-        analytics.track(elementName + ' click', payload)
+    // google tag manager
+    else if (typeof dataLayer !== 'undefined') {
+        dataLayer.push({'event': eventAction, 'event_category': eventCategory, 'event_label': eventLabel});
+    }
+
+    // google analytics (gtag version)
+    else if (typeof gtag !== 'undefined') {
+        gtag('event', eventAction, {'event_category': eventCategory, 'event_label': eventLabel})
+    }
+
+    // google analytics (ga version)
+    else if (typeof ga !== 'undefined') {
+        // ga version
+        ga('send', 'event', eventCategory, eventAction, eventLabel);
     }
 }
 
 
-function WriteElementToDB(activeElement, name='') {
+function annotateElement(activeElement, event_action) {
     var output_json = {
         'domain': document.location.host,
         'page': document.location.pathname,
-        'name': name,
+        'event_action': event_action,
+        'inner_text': activeElement.textContent,
         'instructions': {
             'id': '',
             'className': '',
