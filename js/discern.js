@@ -74,9 +74,9 @@ function reportEvent(eventAction, eventLabel) {
     }
 
     // google tag manager
-    else if (typeof dataLayer !== 'undefined') {
-        dataLayer.push({'event': eventAction, 'event_category': eventCategory, 'event_label': eventLabel});
-    }
+    // else if (typeof dataLayer !== 'undefined') {
+    //     dataLayer.push({'event': eventAction, 'event_category': eventCategory, 'event_label': eventLabel});
+    // }
 
     // google analytics (gtag version)
     else if (typeof gtag !== 'undefined') {
@@ -85,7 +85,6 @@ function reportEvent(eventAction, eventLabel) {
 
     // google analytics (ga version)
     else if (typeof ga !== 'undefined') {
-        // ga version
         ga('send', 'event', eventCategory, eventAction, eventLabel);
     }
 }
@@ -129,5 +128,6 @@ function annotateElement(activeElement, event_action) {
         const data = JSON.stringify(output_json);
         Http.open("POST", url, true);
         Http.send(data);
+        console.log("Added element named '" + output_json['event_action'] + "', inner text: '" + output_json['inner_text'] + "'");
     }
 }
