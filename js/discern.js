@@ -59,11 +59,10 @@ function applyListeners(elementDicts) {
             for (let i = 0; i < classElements.length; i++) {
                 if (classElements[i].textContent === eventLabel) {
                     if (classCounter === elementInstruction['classIndex']) {
-                        classIndex = classCounter;
+                        classIndex = i;
+                        break;
                     }
-                    else {
-                        classCounter += 1;
-                    }
+                    classCounter += 1;
                 }
             }
             elementObject = classElements[classIndex];
@@ -74,17 +73,16 @@ function applyListeners(elementDicts) {
             var tagIndex = -1;
             for (let i = 0; i < tagElements.length; i++) {
                 if (tagElements[i].textContent === eventLabel) {
-                    if (tagCounter === elementInstruction['classIndex']) {
-                        tagIndex = tagCounter;
+                    if (tagCounter === elementInstruction['tagIndex']) {
+                        tagIndex = i;
+                        break;
                     }
-                    else {
-                        tagCounter += 1;
-                    }
+                    tagCounter += 1;
                 }
             }
             elementObject = tagElements[tagIndex];
         }
-        if (elementObject !== null) {
+        if ((elementObject !== null) && (typeof elementObject !== 'undefined')) {
             elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel))
         }
     }
@@ -146,10 +144,11 @@ function annotateElement(event_action) {
         var classCounter = 0;
         var classIndex = -1;
         for (let i = 0; i < classElements.length; i++) {
-            if (classElements[i] === activeElement) {
-                classIndex = classCounter;
-            }
-            else if (classElements[i].textContent === activeElement.textContent) {
+            if (classElements[i].textContent === activeElement.textContent) {
+                if (classElements[i] === activeElement) {
+                    classIndex = classCounter;
+                    break;
+                }
                 classCounter += 1;
             }
         }
@@ -164,10 +163,11 @@ function annotateElement(event_action) {
         var tagCounter = 0;
         var tagIndex = -1;
         for (let i = 0; i < tagElements.length; i++) {
-            if (tagElements[i] === activeElement) {
-                tagIndex = tagCounter;
-            }
-            else if (tagElements[i].textContent === activeElement.textContent) {
+            if (tagElements[i].textContent === activeElement.textContent) {
+                if (tagElements[i] === activeElement) {
+                    tagIndex = tagCounter;
+                    break;
+                }
                 tagCounter += 1;
             }
         }
