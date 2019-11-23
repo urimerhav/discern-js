@@ -19,7 +19,7 @@ Paste the following lines below the Google Analytics / Segment tag and above the
 Note that you would have to place it on every page you want to track (same as with Google Analytics / Segment).
 
 ```
-<script src="https://cdn.jsdelivr.net/gh/urimerhav/discern/js/discern.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/urimerhav/discern-js/js/discern.js"></script>
 <script>const discern = new Discern();</script>
 ```
 
