@@ -8,7 +8,7 @@ A one line script to set up Google Analytics and [Segment](https://segment.com/)
 First make sure you've installed either Google Analytics or Segment on your site's `<head>` tag. See:
 
 * [Google Analytics Install Instructions](https://support.google.com/analytics/answer/1008015?hl=en)
-* [Segment Install Instructions](https://segment.com/docs/sources/website/analytics.js/quickstart/) - only follow step 1, Discren will do the rest. 
+* [Segment Install Instructions](https://segment.com/docs/sources/website/analytics.js/quickstart/) - only follow step 1, Discern will do the rest. 
 
 
 ### Setup
