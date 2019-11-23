@@ -1,10 +1,10 @@
 class Discern {
     constructor(user_api) {
-        this.getAnalysis();
-        this.analyze()
+        this.getElementsFromBackend();
+        this.sendPageForAnalysis();
     }
 
-    getAnalysis() {
+    getElementsFromBackend() {
         // Queries the backend for all elements on this page
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -21,10 +21,15 @@ class Discern {
         xhr.send(data);
     }
 
-    analyze() {
+    sendPageForAnalysis() {
         // This function reports the current html page to our webserver
         // we also want to expand every "relative path" resource. this is TBD.
-        const Http = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                sendAllClickableElements(JSON.parse(this.responseText));
+            }
+        };
         const url = 'https://discern-app.herokuapp.com/analyze_page';
         // const url = 'http://localhost:5000/analyze_page';
         // var bodyHtml = document.getElementsByTagName('body')[0].innerHTML;
@@ -32,8 +37,8 @@ class Discern {
             {'domain': document.location.host,
                     'page': document.location.pathname,
                     'html': ''});
-        Http.open("POST", url, true);
-        Http.send(data);
+        xhr.open("POST", url, true);
+        xhr.send(data);
     }
 }
 
@@ -116,14 +121,33 @@ function reportEvent(eventAction, eventLabel) {
 }
 
 
-function annotateElement(event_action) {
-    const activeElement = document.activeElement;
+function sendAllClickableElements(responseDict) {
+    if (("send_all_elements" in responseDict) && responseDict["send_all_elements"] === true){
+        const aTags = document.getElementsByTagName("a");
+        const buttonTags = document.getElementsByTagName("button");
+        for (let i = 0; i < aTags.length; i++) {
+            sendAllInfoForElement(aTags[i], false)
+        }
+        for (let i = 0; i < buttonTags.length; i++) {
+            sendAllInfoForElement(buttonTags[i], false)
+        }
+    }
+}
+
+
+
+function annotateElement(eventAction) {
+    sendAllInfoForElement(document.activeElement, true, eventAction)
+}
+
+
+function sendAllInfoForElement(element, annotated, eventAction='') {
     var output_json = {
         'domain': document.location.host,
         'page': document.location.pathname,
-        'event_action': event_action,
-        'inner_text': activeElement.textContent,
-        'annotated': true,
+        'event_action': eventAction,
+        'inner_text': element.textContent,
+        'annotated': annotated,
         'instructions': {
             'id': '',
             'className': '',
@@ -134,45 +158,45 @@ function annotateElement(event_action) {
     var addElement = false;
 
     // first see if this element has an ID
-    if (activeElement.id !== "") {
-        output_json['instructions']['id'] = activeElement.id;
+    if (element.id !== "") {
+        output_json['instructions']['id'] = element.id;
         addElement = true;
     }
 
     // second, see if this element has an class
-    else if (activeElement.className !== "") {
-        const classElements = document.getElementsByClassName(activeElement.className);
+    else if (element.className !== "") {
+        const classElements = document.getElementsByClassName(element.className);
         var classCounter = 0;
         var classIndex = -1;
         for (let i = 0; i < classElements.length; i++) {
-            if (classElements[i].textContent === activeElement.textContent) {
-                if (classElements[i] === activeElement) {
+            if (classElements[i].textContent === element.textContent) {
+                if (classElements[i] === element) {
                     classIndex = classCounter;
                     break;
                 }
                 classCounter += 1;
             }
         }
-        output_json['instructions']['className'] = activeElement.className;
+        output_json['instructions']['className'] = element.className;
         output_json['instructions']['classIndex'] = classIndex;
         addElement = true;
     }
 
     // third, use the tag
-    else if (activeElement.tagName !== "") {
-        const tagElements = document.getElementsByTagName(activeElement.tagName);
+    else if (element.tagName !== "") {
+        const tagElements = document.getElementsByTagName(element.tagName);
         var tagCounter = 0;
         var tagIndex = -1;
         for (let i = 0; i < tagElements.length; i++) {
-            if (tagElements[i].textContent === activeElement.textContent) {
-                if (tagElements[i] === activeElement) {
+            if (tagElements[i].textContent === element.textContent) {
+                if (tagElements[i] === element) {
                     tagIndex = tagCounter;
                     break;
                 }
                 tagCounter += 1;
             }
         }
-        output_json['instructions']['tagName'] = activeElement.tagName;
+        output_json['instructions']['tagName'] = element.tagName;
         output_json['instructions']['tagIndex'] = tagIndex;
         addElement = true;
     }
@@ -183,6 +207,8 @@ function annotateElement(event_action) {
         const data = JSON.stringify(output_json);
         Http.open("POST", url, true);
         Http.send(data);
-        console.log("Added element named '" + output_json['event_action'] + "', inner text: '" + output_json['inner_text'] + "'");
+        if (annotated) {
+            console.log("Added element named '" + output_json['event_action'] + "', inner text: '" + output_json['inner_text'] + "'");
+        }
     }
 }
