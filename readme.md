@@ -29,4 +29,4 @@ take up to 24 hours while Discern analyzes user behavior to determine what event
 
 ### Managment
 
-Important events on your website will be tracked with meaningful names. Still, if you want to edit the event names, or disable some of them, you may do so at the discern [dashboard](www.app.getdiscern.com)
+Important events on your website will be tracked with meaningful names. Still, if you want to edit the event names, or disable some of them, you may do so at the discern [dashboard](www.google.com)
