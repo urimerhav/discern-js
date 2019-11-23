@@ -26,3 +26,7 @@ Note that you would have to place it on every page you want to track (same as wi
 
 That's it! All important events will now be automatically tracked and sent to your analytics solution. Note this may 
 take up to 24 hours while Discern analyzes user behavior to determine what events are important enough to track.
+
+### Managment
+
+Important events on your website will be tracked with meaningful names. Still, if you want to edit the event names, or disable some of them, you may do so at the discern [dashboard](www.app.getdiscern.com)
