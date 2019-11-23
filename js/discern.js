@@ -123,6 +123,7 @@ function annotateElement(event_action) {
         'page': document.location.pathname,
         'event_action': event_action,
         'inner_text': activeElement.textContent,
+        'annotated': true,
         'instructions': {
             'id': '',
             'className': '',
