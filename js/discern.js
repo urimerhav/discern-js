@@ -32,11 +32,12 @@ class Discern {
         };
         const url = 'https://discern-app.herokuapp.com/analyze_page';
         // const url = 'http://localhost:5000/analyze_page';
-        // var bodyHtml = document.getElementsByTagName('body')[0].innerHTML;
+
+        var pageHtml = new XMLSerializer().serializeToString(document)
         const data = JSON.stringify(
             {'domain': document.location.host,
                     'page': document.location.pathname,
-                    'html': ''});
+                    'html': pageHtml});
         xhr.open("POST", url, true);
         xhr.send(data);
     }
