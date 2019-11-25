@@ -1,3 +1,4 @@
+// Discern - automatic event reporting.
 class Discern {
     constructor(user_api) {
         this.getElementsFromBackend();
@@ -7,7 +8,7 @@ class Discern {
     getElementsFromBackend() {
         // Queries the backend for all elements on this page
         var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 applyListeners(JSON.parse(this.responseText));
             }
@@ -15,8 +16,10 @@ class Discern {
         const url = 'https://discern-app.herokuapp.com/get_all_elements';
         // const url = 'http://localhost:5000/get_all_elements';
         const data = JSON.stringify(
-            {'domain': document.location.host,
-                    'page': document.location.pathname});
+            {
+                'domain': document.location.host,
+                'page': document.location.pathname
+            });
         xhr.open("POST", url, true);
         xhr.send(data);
     }
@@ -24,81 +27,50 @@ class Discern {
     sendPageForAnalysis() {
         // This function reports the current html page to our webserver
         // we also want to expand every "relative path" resource. this is TBD.
+
+        const url = 'https://discern-app.herokuapp.com/analyze_page';
+        // const url = 'http://localhost:5000/analyze_page';
+
+        const data = JSON.stringify(
+            {
+                'domain': document.location.host,
+                'page': document.location.pathname,
+                'html': new XMLSerializer().serializeToString(document)
+            });
+
         const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 sendAllClickableElements(JSON.parse(this.responseText));
             }
         };
-        const url = 'https://discern-app.herokuapp.com/analyze_page';
-        // const url = 'http://localhost:5000/analyze_page';
-
-        var pageHtml = new XMLSerializer().serializeToString(document)
-        const data = JSON.stringify(
-            {'domain': document.location.host,
-                    'page': document.location.pathname,
-                    'html': pageHtml});
         xhr.open("POST", url, true);
         xhr.send(data);
     }
 }
 
 
+
 function applyListeners(elementDicts) {
     const keys = Object.keys(elementDicts);
     for (let key of keys) {
         let elementDict = elementDicts[key];
-        if ((!("instructions" in elementDict)) || (!("event_action" in elementDict)) || (!("inner_text" in elementDict))) {
-            continue;
-        }
-        let elementInstruction = elementDict['instructions'];
+        let elementObject = DiscernStatic.locateElement(elementDict);
         let eventAction = elementDict['event_action'];
-        let eventLabel = elementDict['inner_text'];
-        var elementObject = null;
-        if (elementInstruction['id'] !== '') {
-            elementObject = document.getElementById(elementInstruction['id']);
-        }
-        else if (elementInstruction['className'] !== '') {
-            let classElements = document.getElementsByClassName(elementInstruction['className']);
-            var classCounter = 0;
-            var classIndex = -1;
-            for (let i = 0; i < classElements.length; i++) {
-                if (classElements[i].textContent === eventLabel) {
-                    if (classCounter === elementInstruction['classIndex']) {
-                        classIndex = i;
-                        break;
-                    }
-                    classCounter += 1;
-                }
-            }
-            elementObject = classElements[classIndex];
-        }
-        else if (elementInstruction['tagName'] !== '') {
-            let tagElements = document.getElementsByTagName(elementInstruction['tagName']);
-            var tagCounter = 0;
-            var tagIndex = -1;
-            for (let i = 0; i < tagElements.length; i++) {
-                if (tagElements[i].textContent === eventLabel) {
-                    if (tagCounter === elementInstruction['tagIndex']) {
-                        tagIndex = i;
-                        break;
-                    }
-                    tagCounter += 1;
-                }
-            }
-            elementObject = tagElements[tagIndex];
-        }
+
         if ((elementObject !== null) && (typeof elementObject !== 'undefined')) {
-            elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel))
+            elementObject.addEventListener('click', () => reportEvent(eventAction))
         }
     }
 }
 
 
-function reportEvent(eventAction, eventLabel) {
-    // and so report for every analytic suite, in order of priority
 
-    const eventCategory = 'Discern: ' + document.location.pathname;
+
+function reportEvent(eventAction, eventLabel=null) {
+    // report for every analytic suite, in order of priority
+
+    const eventCategory = 'Discern';
 
     // segment
     if (typeof analytics !== 'undefined') {
@@ -123,7 +95,7 @@ function reportEvent(eventAction, eventLabel) {
 
 
 function sendAllClickableElements(responseDict) {
-    if (("send_all_elements" in responseDict) && responseDict["send_all_elements"] === true){
+    if (("send_all_elements" in responseDict) && responseDict["send_all_elements"] === true) {
         const aTags = document.getElementsByTagName("a");
         const buttonTags = document.getElementsByTagName("button");
         for (let i = 0; i < aTags.length; i++) {
@@ -136,13 +108,12 @@ function sendAllClickableElements(responseDict) {
 }
 
 
-
 function annotateElement(eventAction) {
     sendAllInfoForElement(document.activeElement, true, eventAction)
 }
 
 
-function sendAllInfoForElement(element, annotated, eventAction='') {
+function sendAllInfoForElement(element, annotated, eventAction = '') {
     var output_json = {
         'domain': document.location.host,
         'page': document.location.pathname,
@@ -154,7 +125,8 @@ function sendAllInfoForElement(element, annotated, eventAction='') {
             'className': '',
             'classIndex': '',
             'tagName': '',
-            'tagIndex': ''}
+            'tagIndex': ''
+        }
     };
     var addElement = false;
 
@@ -165,7 +137,7 @@ function sendAllInfoForElement(element, annotated, eventAction='') {
     }
 
     // second, see if this element has an class
-    else if (element.className !== "") {
+    if (element.className !== "") {
         const classElements = document.getElementsByClassName(element.className);
         var classCounter = 0;
         var classIndex = -1;
@@ -184,7 +156,7 @@ function sendAllInfoForElement(element, annotated, eventAction='') {
     }
 
     // third, use the tag
-    else if (element.tagName !== "") {
+    if (element.tagName !== "") {
         const tagElements = document.getElementsByTagName(element.tagName);
         var tagCounter = 0;
         var tagIndex = -1;
@@ -199,6 +171,7 @@ function sendAllInfoForElement(element, annotated, eventAction='') {
         }
         output_json['instructions']['tagName'] = element.tagName;
         output_json['instructions']['tagIndex'] = tagIndex;
+        output_json['instructions']['innerHTML'] = element.innerHTML;
         addElement = true;
     }
     if (addElement) {
@@ -211,5 +184,49 @@ function sendAllInfoForElement(element, annotated, eventAction='') {
         if (annotated) {
             console.log("Added element named '" + output_json['event_action'] + "', inner text: '" + output_json['inner_text'] + "'");
         }
+    }
+}
+
+class DiscernStatic{
+//    this contains all the static function for discern. used to avoid scope collisions with other scripts
+    static locateElement(elementDict, doc = document) {
+        var elementObject = null;
+        if ((!("instructions" in elementDict)) || (!("event_action" in elementDict)) || (!("inner_text" in elementDict))) {
+            return elementObject;
+        }
+        let elementInstruction = elementDict['instructions'];
+        let eventLabel = elementDict['inner_text'];
+        if (elementInstruction['id'] !== '') {
+            elementObject = doc.getElementById(elementInstruction['id']);
+        } else if (elementInstruction['className'] !== '') {
+            let classElements = doc.getElementsByClassName(elementInstruction['className']);
+            var classCounter = 0;
+            var classIndex = -1;
+            for (let i = 0; i < classElements.length; i++) {
+                if (classElements[i].textContent === eventLabel) {
+                    if (classCounter === elementInstruction['classIndex']) {
+                        classIndex = i;
+                        break;
+                    }
+                    classCounter += 1;
+                }
+            }
+            elementObject = classElements[classIndex];
+        } else if (elementInstruction['tagName'] !== '') {
+            let tagElements = doc.getElementsByTagName(elementInstruction['tagName']);
+            var tagCounter = 0;
+            var tagIndex = -1;
+            for (let i = 0; i < tagElements.length; i++) {
+                if (tagElements[i].textContent === eventLabel) {
+                    if (tagCounter === elementInstruction['tagIndex']) {
+                        tagIndex = i;
+                        break;
+                    }
+                    tagCounter += 1;
+                }
+            }
+            elementObject = tagElements[tagIndex];
+        }
+        return elementObject
     }
 }

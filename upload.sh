@@ -1,0 +1,1 @@
+aws s3 cp ./js/discern.js s3://discern-all/js/discern.js
