@@ -1,0 +1,12 @@
+<canvas id="thecanvas"></canvas>
+<script>
+    var img = new Image();
+    var cv = document.getElementById('thecanvas');
+    img.src = 'https://discern-all.s3.amazonaws.com/localhost%3A63343//discern/example.htmlopojD.jpg?AWSAccessKeyId=AKIAIIRAHWJQOP6LPAZA&Signature=KKeDEdwYRkghxDDlJ6nmVmolgrQ%3D&Expires=1584347003';
+    img.onload = function () {
+        var ctx = cv.getContext('2d');
+        cv.width = img.naturalWidth;
+        cv.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+    };
+</script>

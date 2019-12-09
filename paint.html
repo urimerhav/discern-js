@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<canvas id="myCanvas">
+
+</canvas>
+
+</body>
+
+<script>
+    var ctx;
+
+    window.onload = function () {
+        var img = new Image;
+        img.onload = function () {
+            var myCanvas = document.getElementById('myCanvas');
+            ctx = myCanvas.getContext('2d');
+            ctx.canvas.height=img.height;
+            ctx.canvas.width=img.width;
+
+            ctx.drawImage(img, 0, 0);
+            //
+            ctx.beginPath();
+            ctx.rect(8, 147.3984375, 58, 18);
+            // ctx.fillStyle = 'black';
+            // ctx.fill();
+            ctx.lineWidth = 7;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+        };
+        img.src = "https://discern-all.s3.amazonaws.com/localhost%3A63343//discern/example.htmlLbZm9.jpg?AWSAccessKeyId=AKIAIIRAHWJQOP6LPAZA&Signature=GlE7YTaXlK3bRYqqZ94xNd0AjN0%3D&Expires=1584347226";
+
+    }
+</script>
+</html>
