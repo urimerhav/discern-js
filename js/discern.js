@@ -5,9 +5,11 @@
 const BACKEND_URL = 'http://localhost:5000';
 
 class Discern {
-    constructor(user_api) {
+    constructor(user_api, enableSendPageForAnalysis=false) {
         this.getElementsFromBackend();
-        this.sendPageForAnalysis();
+        if (enableSendPageForAnalysis) {
+            this.sendPageForAnalysis();
+        }
     }
 
     getElementsFromBackend() {
