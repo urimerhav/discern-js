@@ -1,8 +1,8 @@
 // Discern - automatic event reporting.
 
 // screenshot grabber
-// const BACKEND_URL = 'https://discern-app.herokuapp.com'
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://discern-app.herokuapp.com'
+// const BACKEND_URL = 'http://localhost:5000';
 
 class Discern {
     constructor(user_api, enableSendPageForAnalysis=false) {
@@ -21,7 +21,6 @@ class Discern {
             }
         };
         const url = BACKEND_URL + '/get_all_elements';
-        // const url = 'http://localhost:5000/get_all_elements';
         const data = JSON.stringify(
             {
                 'domain': document.location.host,
@@ -35,7 +34,6 @@ class Discern {
         // This function reports the current html page to our webserver
         // we also want to expand every "relative path" resource. this is TBD.
 
-        // const url = 'https://discern-app.herokuapp.com/analyze_page';
         const url = BACKEND_URL + '/analyze_page';
         const sessionId = '_' + Math.random().toString(8).substr(2, 9);
 
@@ -125,7 +123,6 @@ function reportEvent(eventAction, eventLabel = null) {
 function upload_element_instruction(output_json) {
     const Http = new XMLHttpRequest();
     const url = BACKEND_URL + '/add_element';
-    // const url = 'http://localhost:5000/add_element';
     const data = JSON.stringify(output_json);
     Http.open("POST", url, true);
     Http.send(data);
