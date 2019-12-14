@@ -3,12 +3,16 @@
 // screenshot grabber
 const BACKEND_URL = 'https://discern-app.herokuapp.com'
 // const BACKEND_URL = 'http://localhost:5000';
+const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
 class Discern {
-    constructor(user_api, enableSendPageForAnalysis=false) {
+    constructor(user_api, enableSendPageForAnalysis=false, enableSendPageForPageView=True) {
         this.getElementsFromBackend();
         if (enableSendPageForAnalysis) {
             this.sendPageForAnalysis();
+        }
+        if (enableSendPageForPageView) {
+            this.sendPageView();
         }
     }
 
@@ -30,12 +34,27 @@ class Discern {
         xhr.send(data);
     }
 
+    sendPageView() {
+        // This function reports every pageview to our webserver
+        const url = BACKEND_URL + '/add_page';
+        const Http = new XMLHttpRequest();
+
+        const data = JSON.stringify(
+            {
+                'domain': document.location.host,
+                'page': document.location.pathname,
+                'session_id', SESSIONID)
+            });
+        Http.open("POST", url, true);
+        Http.send(data);
+
+    }
+
     sendPageForAnalysis() {
         // This function reports the current html page to our webserver
         // we also want to expand every "relative path" resource. this is TBD.
 
         const url = BACKEND_URL + '/analyze_page';
-        const sessionId = '_' + Math.random().toString(8).substr(2, 9);
 
         // screenshot entire webpage:
         html2canvas(document.body, {scale: 1}).then(canvas => {
@@ -49,7 +68,7 @@ class Discern {
 
                 formData.append("domain", document.location.host);
                 formData.append("page", document.location.pathname); // number 123456 is immediately converted to a string "123456"
-                formData.append('session_id', sessionId);
+                formData.append('session_id', SESSIONID);
                 formData.append("screenshot", imgBlob);
 
                 xhr.open("POST", url, true);
@@ -70,7 +89,7 @@ class Discern {
 
             const elementsInstructions = generateAllInstructions(listenableElements);
             for (let i in elementsInstructions) {
-                elementsInstructions[i]['session_id'] = sessionId;
+                elementsInstructions[i]['session_id'] = SESSIONID;
                 upload_element_instruction(elementsInstructions[i])
             }
         });
@@ -3788,4 +3807,3 @@ class DiscernStatic {
         return void 0 === e && (e = {}), Vs(A, e)
     }
 });
-
