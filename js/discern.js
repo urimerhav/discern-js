@@ -6,7 +6,7 @@ const BACKEND_URL = 'https://discern-app.herokuapp.com'
 const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
 class Discern {
-    constructor(user_api, enableSendPageForAnalysis=false, enableSendPageForPageView=True) {
+    constructor(user_api, enableSendPageForAnalysis=false, enableSendPageForPageView=true) {
         this.getElementsFromBackend();
         if (enableSendPageForAnalysis) {
             this.sendPageForAnalysis();
@@ -35,7 +35,7 @@ class Discern {
     }
 
     sendPageView() {
-        // This function reports every pageview to our webserver
+        // This function reports pageview to our webserver
         const url = BACKEND_URL + '/add_page';
         const Http = new XMLHttpRequest();
 
@@ -43,7 +43,7 @@ class Discern {
             {
                 'domain': document.location.host,
                 'page': document.location.pathname,
-                'session_id', SESSIONID)
+                'session_id': SESSIONID
             });
         Http.open("POST", url, true);
         Http.send(data);
