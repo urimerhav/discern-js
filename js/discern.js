@@ -7,13 +7,22 @@ const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
 class Discern {
     constructor(user_api, enableSendPageForAnalysis=false, enableSendPageForPageView=true) {
-        this.getElementsFromBackend();
-        if (enableSendPageForAnalysis) {
-            this.sendPageForAnalysis();
-        }
-        if (enableSendPageForPageView) {
-            this.sendPageView();
-        }
+        console.log('discern statring...')
+        var self = this;
+        window.addEventListener('load', function () {
+            console.log('fetching elements from backend...')
+            self.getElementsFromBackend();
+
+            if (enableSendPageForAnalysis) {
+                console.log('send for analysis...')
+                self.sendPageForAnalysis();
+            }
+            if (enableSendPageForPageView) {
+                console.log('report pageviews...')
+                self.sendPageView();
+            }
+
+        })
     }
 
     getElementsFromBackend() {
