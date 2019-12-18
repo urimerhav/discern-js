@@ -8,7 +8,7 @@ const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
 class Discern {
     constructor(user_api, enableSendPageForAnalysis = false, enableSendPageForPageView = true) {
-        console.log('discern statring...')
+        console.log('discern starting...')
         var self = this;
 
         self.completed = false;
