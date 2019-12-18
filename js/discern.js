@@ -1,28 +1,47 @@
 // Discern - automatic event reporting.
 
 // screenshot grabber
-const BACKEND_URL = 'https://discern-app.herokuapp.com'
-// const BACKEND_URL = 'http://localhost:5000';
+// const BACKEND_URL = 'https://discern-app.herokuapp.com'
+const BACKEND_URL = 'http://localhost:5000';
 const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
+
 class Discern {
-    constructor(user_api, enableSendPageForAnalysis=false, enableSendPageForPageView=true) {
+    constructor(user_api, enableSendPageForAnalysis = false, enableSendPageForPageView = true) {
         console.log('discern statring...')
         var self = this;
+
+        self.completed = false;
+
+        // run the constructor as soon as page has completed loading
         window.addEventListener('load', function () {
-            console.log('fetching elements from backend...')
-            self.getElementsFromBackend();
+            self.instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView);
+            self.completed = true
+        });
 
-            if (enableSendPageForAnalysis) {
-                console.log('send for analysis...')
-                self.sendPageForAnalysis();
+        // if page didn't complete loading in X seconds, run the constructor anyway
+        setTimeout(function () {
+            if (!self.completed) {
+                // time's up without page load - report results
+                self.instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView);
+                self.completed = true;
             }
-            if (enableSendPageForPageView) {
-                console.log('report pageviews...')
-                self.sendPageView();
-            }
+        }, 5 * 1000);
+    }
 
-        })
+
+    instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView) {
+        console.log('fetching elements from backend...')
+        self.getElementsFromBackend();
+
+        if (enableSendPageForAnalysis) {
+            console.log('send for analysis...')
+            self.sendPageForAnalysis();
+        }
+        if (enableSendPageForPageView) {
+            console.log('report pageviews...')
+            self.sendPageView();
+        }
     }
 
     getElementsFromBackend() {
