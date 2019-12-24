@@ -6,8 +6,8 @@ const BACKEND_URL = 'https://discern-app.herokuapp.com'
 const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
 
-class Discern {
-    constructor(user_api, enableSendPageForAnalysis = false, enableSendPageForPageView = true) {
+class DiscernAnalyse {
+    constructor() {
         console.log('discern starting...')
         var self = this;
 
@@ -15,7 +15,7 @@ class Discern {
 
         // run the constructor as soon as page has completed loading
         window.addEventListener('load', function () {
-            self.instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView);
+            self.instantiate(self);
             self.completed = true
         });
 
@@ -23,60 +23,18 @@ class Discern {
         setTimeout(function () {
             if (!self.completed) {
                 // time's up without page load - report results
-                self.instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView);
+                self.instantiate(self);
                 self.completed = true;
             }
         }, 5 * 1000);
     }
 
 
-    instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView) {
-        console.log('fetching elements from backend...')
-        self.getElementsFromBackend();
-
-        if (enableSendPageForAnalysis) {
-            console.log('send for analysis...')
-            self.sendPageForAnalysis();
-        }
-        if (enableSendPageForPageView) {
-            console.log('report pageviews...')
-            self.sendPageView();
-        }
+    instantiate(self) {
+        console.log('send for analysis...')
+        self.sendPageForAnalysis();
     }
 
-    getElementsFromBackend() {
-        // Queries the backend for all elements on this page
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                applyListeners(JSON.parse(this.responseText));
-            }
-        };
-        const url = BACKEND_URL + '/get_all_elements';
-        const data = JSON.stringify(
-            {
-                'domain': document.location.host,
-                'page': document.location.pathname
-            });
-        xhr.open("POST", url, true);
-        xhr.send(data);
-    }
-
-    sendPageView() {
-        // This function reports pageview to our webserver
-        const url = BACKEND_URL + '/add_page';
-        const Http = new XMLHttpRequest();
-
-        const data = JSON.stringify(
-            {
-                'domain': document.location.host,
-                'page': document.location.pathname,
-                'session_id': SESSIONID
-            });
-        Http.open("POST", url, true);
-        Http.send(data);
-
-    }
 
     sendPageForAnalysis() {
         // This function reports the current html page to our webserver
@@ -126,48 +84,6 @@ class Discern {
     }
 }
 
-
-function applyListeners(elementDicts) {
-    const keys = Object.keys(elementDicts);
-    for (let key of keys) {
-        let elementDict = elementDicts[key];
-        let elementObject = DiscernStatic.locateElement(elementDict);
-        let eventAction = elementDict['event_action'];
-        let eventCategory = elementDict['event_category'];
-        let eventLabel = elementDict['event_label'];
-        let eventValue = elementDict['event_value'];
-
-        if ((elementObject !== null) && (typeof elementObject !== 'undefined')) {
-            elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel, eventCategory))
-        }
-    }
-}
-
-
-function reportEvent(eventAction, eventLabel = null, eventCategory = 'Discern', eventValue = null) {
-    // report for every analytic suite, in order of priority
-    // eventAction is a mandatory input,  label and category are optional
-
-    // segment
-    if (typeof analytics !== 'undefined') {
-        analytics.track(eventAction, {'category': eventCategory, 'label': eventLabel, 'value': eventValue});
-    }
-
-    // google tag manager
-    // else if (typeof dataLayer !== 'undefined') {
-    //     dataLayer.push({'event': eventAction, 'event_category': eventCategory, 'event_label': eventLabel});
-    // }
-
-    // google analytics (gtag version)
-    else if (typeof gtag !== 'undefined') {
-        gtag('event', eventAction, {'event_category': eventCategory, 'event_label': eventLabel, 'event_value': eventValue})
-    }
-
-    // google analytics (ga version)
-    else if (typeof ga !== 'undefined') {
-        ga('send', 'event', eventCategory, eventAction, eventLabel, eventValue);
-    }
-}
 
 function upload_element_instruction(output_json) {
     const Http = new XMLHttpRequest();
