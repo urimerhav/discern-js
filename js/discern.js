@@ -133,21 +133,24 @@ function applyListeners(elementDicts) {
         let elementDict = elementDicts[key];
         let elementObject = DiscernStatic.locateElement(elementDict);
         let eventAction = elementDict['event_action'];
+        let eventCategory = elementDict['event_category'];
+        let eventLabel = elementDict['event_label'];
+        let eventValue = elementDict['event_value'];
 
         if ((elementObject !== null) && (typeof elementObject !== 'undefined')) {
-            elementObject.addEventListener('click', () => reportEvent(eventAction))
+            elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel, eventCategory))
         }
     }
 }
 
 
-function reportEvent(eventAction, eventLabel = null, eventCategory = 'Discern') {
+function reportEvent(eventAction, eventLabel = null, eventCategory = 'Discern', eventValue = null) {
     // report for every analytic suite, in order of priority
-    // eventAction is a mandatory input,  label and category are optional 
+    // eventAction is a mandatory input,  label and category are optional
 
     // segment
     if (typeof analytics !== 'undefined') {
-        analytics.track(eventAction, {'category': eventCategory, 'label': eventLabel});
+        analytics.track(eventAction, {'category': eventCategory, 'label': eventLabel, 'value': eventValue});
     }
 
     // google tag manager
@@ -157,12 +160,12 @@ function reportEvent(eventAction, eventLabel = null, eventCategory = 'Discern') 
 
     // google analytics (gtag version)
     else if (typeof gtag !== 'undefined') {
-        gtag('event', eventAction, {'event_category': eventCategory, 'event_label': eventLabel})
+        gtag('event', eventAction, {'event_category': eventCategory, 'event_label': eventLabel, 'event_value': eventValue})
     }
 
     // google analytics (ga version)
     else if (typeof ga !== 'undefined') {
-        ga('send', 'event', eventCategory, eventAction, eventLabel);
+        ga('send', 'event', eventCategory, eventAction, eventLabel, eventValue);
     }
 }
 
