@@ -143,7 +143,8 @@ function applyListeners(elementDicts) {
 
 function reportEvent(eventAction, eventLabel = null, eventCategory = 'Discern') {
     // report for every analytic suite, in order of priority
-  
+    // eventAction is a mandatory input,  label and category are optional 
+
     // segment
     if (typeof analytics !== 'undefined') {
         analytics.track(eventAction, {'category': eventCategory, 'label': eventLabel});
