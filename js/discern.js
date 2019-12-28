@@ -257,7 +257,7 @@ class DiscernStatic {
 //    this contains all the static function for discern. used to avoid scope collisions with other scripts
     static locateElement(elementDict, doc = document) {
         var elementObject = null;
-        if ((!("instructions" in elementDict)) || (!("event_action" in elementDict)) || (!("inner_text" in elementDict))) {
+        if ((!("instructions" in elementDict)) || (!("action" in elementDict)) || (!("inner_text" in elementDict))) {
             return elementObject;
         }
         let elementInstruction = elementDict['instructions'];
