@@ -132,10 +132,10 @@ function applyListeners(elementDicts) {
     for (let key of keys) {
         let elementDict = elementDicts[key];
         let elementObject = DiscernStatic.locateElement(elementDict);
-        let eventAction = elementDict['event_action'];
-        let eventCategory = elementDict['event_category'];
-        let eventLabel = elementDict['event_label'];
-        let eventValue = elementDict['event_value'];
+        let eventAction = elementDict['action'];
+        let eventCategory = elementDict['category'];
+        let eventLabel = elementDict['label'];
+        let eventValue = elementDict['value'];
 
         if ((elementObject !== null) && (typeof elementObject !== 'undefined')) {
             elementObject.addEventListener('click', () => reportEvent(eventAction, eventLabel, eventCategory))
