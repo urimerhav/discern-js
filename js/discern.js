@@ -7,7 +7,7 @@ const SESSIONID = '_' + Math.random().toString(8).substr(2, 9);
 
 
 class Discern {
-    constructor(user_api, enableSendPageForAnalysis = false, enableSendPageForPageView = true) {
+    constructor(user_api, enableSendPageForPageView = true) {
         console.log('discern starting...')
         var self = this;
 
@@ -15,7 +15,7 @@ class Discern {
 
         // run the constructor as soon as page has completed loading
         window.addEventListener('load', function () {
-            self.instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView);
+            self.instantiate(self, enableSendPageForPageView);
             self.completed = true
         });
 
@@ -23,21 +23,17 @@ class Discern {
         setTimeout(function () {
             if (!self.completed) {
                 // time's up without page load - report results
-                self.instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView);
+                self.instantiate(self, enableSendPageForPageView);
                 self.completed = true;
             }
         }, 5 * 1000);
     }
 
 
-    instantiate(self, enableSendPageForAnalysis, enableSendPageForPageView) {
+    instantiate(self, enableSendPageForPageView) {
         console.log('fetching elements from backend...')
         self.getElementsFromBackend();
 
-        if (enableSendPageForAnalysis) {
-            console.log('send for analysis...')
-            self.sendPageForAnalysis();
-        }
         if (enableSendPageForPageView) {
             console.log('report pageviews...')
             self.sendPageView();
