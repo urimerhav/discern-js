@@ -110,12 +110,12 @@ function reportEvent(eventAction, eventLabel = null, eventCategory = 'Discern', 
     // }
 
     // google analytics (gtag version)
-    else if (typeof gtag !== 'undefined') {
+    if (typeof gtag !== 'undefined') {
         gtag('event', eventAction, {'event_category': eventCategory, 'event_label': eventLabel, 'event_value': eventValue})
     }
 
     // google analytics (ga version)
-    else if (typeof ga !== 'undefined') {
+    if (typeof ga !== 'undefined') {
         ga('send', 'event', eventCategory, eventAction, eventLabel, eventValue);
     }
 }
